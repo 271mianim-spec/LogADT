@@ -49,9 +49,27 @@ public class ArrayLog<T> implements EnhancedLogInterface<T>
         return size == log.length;
     }
 
+    // Returns the last element that is empty
+    public int getLastIndex()
+    {
+        for(int i = 0; i < size; i++) {
+            if (log[i] == null) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
     // Appends the specified element to the end of this list.
     public void add(T element)
     {
+        int lastIndex = getLastIndex();
+        if (lastIndex == -1) {
+            // full
+        } else {
+            // not full
+            log[lastIndex] = element;
+        }
     }
   
     // Returns the element at the specified position in this list.
