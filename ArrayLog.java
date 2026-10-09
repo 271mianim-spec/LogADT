@@ -3,8 +3,8 @@
  * This ArrayLog object represents a Log ADT implemented as
  * a generic data type array using the EnhancedLogInterface.
  * 
- * @author  
- * @version 
+ * @author  Matthew
+ * @version 1
  */
 @SuppressWarnings("unchecked")  // eliminates compiler warnings from cast below
 public class ArrayLog<T> implements EnhancedLogInterface<T>
@@ -34,19 +34,19 @@ public class ArrayLog<T> implements EnhancedLogInterface<T>
     // Returns the logical size of this StringLog.
     public int size()
     {
-        return size;
+        return this.size;
     }
     
     // Returns true if this list contains no elements.
     public boolean isEmpty()
     {
-        return size == 0;
+        return this.size == 0;
     }
     
     // Returns true if this list is completely full.
     public boolean isFull()
     {
-        return size == log.length;
+        return this.size == this.log.length;
     }
 
     // Returns the last element that is empty
@@ -60,35 +60,53 @@ public class ArrayLog<T> implements EnhancedLogInterface<T>
         return -1;
     }
 
+    public void manageSize() {
+        int exponent = Math.min(2, size);
+        int newSize = (int) Math.pow(2, exponent);
+
+        int lastIndex = getLastIndex();
+
+        if (lastIndex != newSize) {
+            T[] temp = (T[])new Object[newSize];
+
+            for (int i = 0; i < lastIndex; i++) {
+                temp[i] = this.log[i];
+            }
+            this.log = temp;
+        }
+    }
+
     // Appends the specified element to the end of this list.
     public void add(T element)
     {
+        size++;
+        manageSize();
         int lastIndex = getLastIndex();
-        if (lastIndex == -1) {
-            // full
-        } else {
-            // not full
-            log[lastIndex] = element;
-        }
+        log[lastIndex] = element;
     }
   
     // Returns the element at the specified position in this list.
     public T get(int index)
-    {   
-        return null;
+    {
+        return this.log[index];
     }
     
     // Returns the index of the first occurance of the specified element
     // in this list, or -1 if this list does not contain the element.
     public int indexOf(T element)
     {
+        for (int i = 0; i < size; i++) {
+            if (log[i] == element) {
+                return i;
+            }
+        }
         return -1;
     }
     
     // Returns true if this list contains the specified element.
     public boolean contains(T element)
     {
-        return false;
+        return indexOf(element) != -1;
     }
     
     // Returns a formatted string representation of this StringLog.
@@ -106,7 +124,9 @@ public class ArrayLog<T> implements EnhancedLogInterface<T>
     // with the specified element.  Returns what was at that location
     public T set(int index, T element)
     {
-        return null;
+        T elementAtIndex = this.get(index);
+        this.log[index] = element;
+        return elementAtIndex;
     }
     
     // Inserts the specified element at the specified position in this list.
