@@ -46,30 +46,24 @@ public class ArrayLog<T> implements EnhancedLogInterface<T>
     // Returns true if this list is completely full.
     public boolean isFull()
     {
-        return this.size == this.log.length;
+        return this.size >= this.log.length;
     }
 
-    // Returns the last element that is empty
-    public int getLastIndex()
-    {
-        for(int i = 0; i < size; i++) {
-            if (log[i] == null) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
+    // Makes sure the array's size is correct
     public void manageSize() {
-        int exponent = Math.min(2, size);
-        int newSize = (int) Math.pow(2, exponent);
+        int newArraySize = 4;
 
-        int lastIndex = getLastIndex();
+        while(newArraySize < size) {
+            newArraySize*=2;
+        }
 
-        if (lastIndex != newSize) {
-            T[] temp = (T[])new Object[newSize];
+        if (newArraySize != this.log.length) {
 
-            for (int i = 0; i < lastIndex; i++) {
+            T[] temp = (T[])new Object[newArraySize];
+
+            int copyingSize = Math.min(this.log.length, size);
+
+            for (int i = 0; i < copyingSize; i++) {
                 temp[i] = this.log[i];
             }
             this.log = temp;
@@ -81,13 +75,16 @@ public class ArrayLog<T> implements EnhancedLogInterface<T>
     {
         size++;
         manageSize();
-        int lastIndex = getLastIndex();
-        log[lastIndex] = element;
+        log[size-1] = element;
     }
   
     // Returns the element at the specified position in this list.
     public T get(int index)
     {
+        if (index < 0 || index >= size) {
+            return null;
+        }
+
         return this.log[index];
     }
     
@@ -132,6 +129,13 @@ public class ArrayLog<T> implements EnhancedLogInterface<T>
     // Inserts the specified element at the specified position in this list.
     public void add(int index, T element)
     {
+        size++;
+        manageSize();
+
+        for (int i = size; i > index; i--) {
+            log[i] = log[i-1];
+        }
+        log[index] = element;
     }
     
     // Removes the element at the specified position in this list, and
@@ -139,7 +143,17 @@ public class ArrayLog<T> implements EnhancedLogInterface<T>
     // are set to null.
     public T remove(int index)
     {
-        return null;
+        T elementAtIndex = log[index];
+
+        for (int i = index; i < size-1; i++) {
+            log[i] = log[i+1];
+        }
+        log[size-1] = null;
+
+        size--;
+        manageSize();
+
+        return elementAtIndex;
     }
     
     // Removes the first occurance of the specified element from this
@@ -147,11 +161,19 @@ public class ArrayLog<T> implements EnhancedLogInterface<T>
     // removed), false otherwise.
     public boolean remove(T element)
     {
-        return false;
+        int index = indexOf(element);
+        if (index == -1) {
+            return false;
+        }
+
+        remove(index);
+        return true;
     }
     
     // Removes all of the elements from this list.
     public void clear()
     {
+        this.log = (T[])new Object[4];
+        this.size = 0;
     }
 }
