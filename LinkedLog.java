@@ -137,8 +137,15 @@ public class LinkedLog<T> implements EnhancedLogInterface<T>
     // removes the element at the specified position in this list
     public T remove(int index)
     {
+        if (index == 0) {
+            T oldElement = this.log.getInfo();
+            this.log = this.log.getLink();
+            this.size--;
+            return oldElement;
+        }
+
         LLNode<T> previous = this.log;
-        for (int i = 0; i < index+1; i++) {
+        for (int i = 0; i < index-1; i++) {
             previous = previous.getLink();
         }
 
@@ -159,11 +166,18 @@ public class LinkedLog<T> implements EnhancedLogInterface<T>
     // list, if it is present
     public boolean remove(T element)
     {
-        return false;
+        int index = indexOf(element);
+        if (index == -1) {
+            return false;
+        }
+        remove(index);
+        return true;
     }
         
     // removes all of the elements from this list
     public void clear()
     {
+        this.log = null;
+        this.size = 0;
     }
 }
